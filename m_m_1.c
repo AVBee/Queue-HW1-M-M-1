@@ -1,3 +1,6 @@
+//Bee starts 3/25/2017
+//Last Updated 3/30/2017 
+
 #include <stdio.h>
 #include <math.h>
 #include "lcgrand.h" /* Header file for random-number generator. */
@@ -16,6 +19,11 @@ void arrive(void);
 void depart(void);
 void report(void);
 void update_time_avg_stats(void);
+void sys_leng(void);
+void serv_util(void);
+void sys_del(void);
+void mean_queue_length(void)
+void mean_delay(void);
 float expon(float mean);
 main() /* Main function. */
 {
@@ -97,8 +105,6 @@ void timing(void) /* Timing function. */
  next_event_type = i;
  }
 
-
-
  /* Check to see whether the event list is empty. */
  if (next_event_type == 0) {
  /* The event list is empty, so stop the simulation. */
@@ -173,21 +179,11 @@ void depart(void) /* Departure event function. */
 void report(void) /* Report generator function. */
 {
  /* Compute and write estimates of desired measures of performance. */
- fprintf(outfile, "\n\nAverage delay in queue%11.3f minutes\n\n",
- total_of_delays / num_custs_delayed);
- fprintf(outfile, "Average number in queue%10.3f\n\n",
- area_num_in_q / sim_time);
- fprintf(outfile, "Server utilization%15.3f\n\n",
- area_server_status / sim_time);
- v_sysdelay = area_num_in_q / sim_time; /*system delay = delay queue + service time */
- fprintf(outfile, "Time simulation ended%12.3f minutes\n\n", sim_time);
- v_sysleng = num_delays_required/sim_time;
- fprintf(outfile, "mean system length  %.3f \n\n", v_sysleng);
- syst_delay_var = v_sysdelay + mean_service;
- fprintf(outfile, "mean system delay  %.3f minute(s)\n\n", syst_delay_var );
-
- //syst_delay();
- //syst_leng();
+ mean_delay();
+ sys_leng();
+ serv_util();
+ sys_del();
+ 
 }
 void update_time_avg_stats(void) /* Update area accumulators for time-average
  statistics. */
@@ -207,34 +203,45 @@ float expon(float mean) /* Exponential variate generation function. */
 
  return -mean * log(lcgrand(1));
 }
-/*
-void syst_delay(void)
-{
 
-    syst_delay_var = v_sysdelay + mean_service;
-    fprintf(outfile, "mean system delay = %.3f minute(s)\n\n", syst_delay_var );
+void mean_delay(void)
+{
+    float x;
+    x = total_of_delays / num_custs_delayed;
+    //fprintf(outfile, "mean system delay = %.3f minute(s)\n\n", x );
+    fprintf(outfile, "\n\nAverage delay in queue%11.3f minutes\n\n", x);
 
 }
 //Mean number of customers in the system.
 //mean system length
-
-void syst_leng()
+void mean_queue_length(void)
 {
-    float y, cal_temp;
-    cal_temp = 1 / mean_interarrival;
-    y = syst_delay_var * cal_temp;
-    fprintf(outfile, "mean system length = %.3f\n\n", y);
+   v_sysdelay = area_num_in_q / sim_time;
+   fprintf(outfile, "mean queue length  %.3f \n\n", v_sysdelay);
 }
 
-void prob_no_cust()
+void sys_del(void)
 {
-    #P0=((1-server utilisation)/(1-(server uti^(k+1))))
-
+    
+    syst_delay_var = v_sysdelay + mean_service;
+    fprintf(outfile, "mean system delay  %.3f \n\n", syst_delay_var);
 }
 
-void prob_not_join()
-{
-    #Pn=((1-serv uti)/(1-(serv uti^(k+1)*(serv uti^k))
 
+
+void serv_util(void)
+{
+    float y;
+    y = area_server_status / sim_time;
+    fprintf(outfile, "Server utilization%15.3f\n\n", y);
 }
-*/
+
+
+void sys_leng(void)
+{
+    float z;
+    float f = 1.0;
+    fprintf(outfile, "mean system length  %.3f \n\n", (num_custs_delayed + num_in_q)*f/sim_time);
+}
+
+
