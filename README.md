@@ -8,7 +8,8 @@ README
 Files Includes With This Project:
 
 	main1.c
-  
+	lcgrand.h -- generator random variable
+	m_m_1.in  -- input file
 	README.md
 -------------------------
 ****compile****
@@ -31,11 +32,15 @@ Files Includes With This Project:
 ***** Introduction *****
 ------------------------------
 
-	This program is demo program of lab's assignment for study purpose only. It contain implemetation of shared memory
-	and introduction of parallel computing in C (POSIX Thread).
+	This program is assignment program of Computer Simulation course for study purpose only. 
+	It contain implementation of queue theory to calculate :
+		1. Mean queue length
+		2. Mean queue delay
+		3. Mean system delay
+		4. Mean system length
+		5. differences between mean system delay and mean queueing delay
 	
-	shared memory is implemented to share resource between master and slave, so both program would share the data in
-	certain memory when run at the same time. 
+	
 	
 
 
