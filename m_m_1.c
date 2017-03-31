@@ -1,5 +1,7 @@
-//Bee starts 3/25/2017
-//Last Updated 3/30/2017 
+// starts 3/25/2017
+
+// AVBee rev.2.0 Last Update : March 31,2017
+// Queue M/M/1
 
 #include <stdio.h>
 #include <math.h>
@@ -19,16 +21,19 @@ void arrive(void);
 void depart(void);
 void report(void);
 void update_time_avg_stats(void);
-void sys_leng(void);
-void serv_util(void);
-void sys_del(void);
-void mean_queue_length(void)
 void mean_delay(void);
+void serv_util(void);
+void rr(void);
+void mean_qu_length(void);
+void syst_leng(void);
 float expon(float mean);
+void mean_sys_length(void);
+
+
 main() /* Main function. */
 {
  /* Open input and output files. */
- infile = fopen("mm1.in", "r");
+ infile = fopen("mmc.in", "r");
  outfile = fopen("mm1.out", "w");
  /* Specify the number of events for the timing function. */
  num_events = 2;
@@ -69,6 +74,8 @@ main() /* Main function. */
  }
  /* Invoke the report generator and end the simulation. */
  report();
+
+
  fclose(infile);
  fclose(outfile);
  return 0;
@@ -105,12 +112,18 @@ void timing(void) /* Timing function. */
  next_event_type = i;
  }
 
+
+
  /* Check to see whether the event list is empty. */
  if (next_event_type == 0) {
  /* The event list is empty, so stop the simulation. */
  fprintf(outfile, "\nEvent list empty at time %f", sim_time);
  exit(1);
  }
+
+
+
+
  /* The event list is not empty, so advance the simulation clock. */
  sim_time = min_time_next_event;
 }
@@ -123,6 +136,7 @@ void arrive(void) /* Arrival event function. */
  if (server_status == BUSY) {
  /* Server is busy, so increment number of customers in queue. */
  ++num_in_q;
+
  /* Check to see whether an overflow condition exists. */
  if (num_in_q > Q_LIMIT) {
  /* The queue has overflowed, so stop the simulation. */
@@ -144,7 +158,8 @@ void arrive(void) /* Arrival event function. */
  /* Increment the number of customers delayed, and make server busy. */
  ++num_custs_delayed;
  server_status = BUSY;
- /* Schedule a departure (service completion). */
+ /* Schedule a departure (service c
+void mean_queue_length(void)ompletion). */
  time_next_event[2] = sim_time + expon(mean_service);
  }
 }
@@ -179,11 +194,17 @@ void depart(void) /* Departure event function. */
 void report(void) /* Report generator function. */
 {
  /* Compute and write estimates of desired measures of performance. */
- mean_delay();
- sys_leng();
- serv_util();
- sys_del();
- 
+
+    mean_delay();
+
+    serv_util();
+
+    sys_del();
+
+    mean_sys_length();
+
+    mean_qu_length();
+
 }
 void update_time_avg_stats(void) /* Update area accumulators for time-average
  statistics. */
@@ -194,6 +215,7 @@ void update_time_avg_stats(void) /* Update area accumulators for time-average
  time_last_event = sim_time;
  /* Update area under number-in-queue function. */
  area_num_in_q += num_in_q * time_since_last_event;
+
  /* Update area under server-busy indicator function. */
  area_server_status += server_status * time_since_last_event;
 }
@@ -208,26 +230,34 @@ void mean_delay(void)
 {
     float x;
     x = total_of_delays / num_custs_delayed;
-    //fprintf(outfile, "mean system delay = %.3f minute(s)\n\n", x );
+
     fprintf(outfile, "\n\nAverage delay in queue%11.3f minutes\n\n", x);
 
 }
 //Mean number of customers in the system.
 //mean system length
-void mean_queue_length(void)
-{
-   v_sysdelay = area_num_in_q / sim_time;
-   fprintf(outfile, "mean queue length  %.3f \n\n", v_sysdelay);
-}
-
 void sys_del(void)
 {
-    
+    v_sysdelay = area_num_in_q / sim_time;
     syst_delay_var = v_sysdelay + mean_service;
     fprintf(outfile, "mean system delay  %.3f \n\n", syst_delay_var);
 }
 
+void mean_qu_length(void)
+{
+    v_sysdelay = area_num_in_q / sim_time;
+    fprintf(outfile, "mean queue length%.3f \n\n", v_sysdelay);
+}
+void syst_leng(void)
+{
 
+    float y, cal_temp;
+
+    y = num_in_q / sim_time;
+
+    fprintf(outfile, "mean queue length = %d\n\n", y);
+
+}
 
 void serv_util(void)
 {
@@ -237,11 +267,12 @@ void serv_util(void)
 }
 
 
-void sys_leng(void)
+void mean_sys_length(void)
 {
     float z;
     float f = 1.0;
-    fprintf(outfile, "mean system length  %.3f \n\n", (num_custs_delayed + num_in_q)*f/sim_time);
+    z = num_delays_required/sim_time;
+    fprintf(outfile, "Time simulation ended%12.3f minutes\n\n", z);
+    fprintf(outfile, "mean system length %f \n\n", (num_custs_delayed + num_in_q)*f/sim_time);
 }
-
 
